@@ -1,10 +1,12 @@
 const express = require('express');
 const axios = require("axios").default;
-let books = require("./booksdb.js");
+// let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
- 
+
+const booksURL = "https://raw.githubusercontent.com/AdamAliWeb/expressBookReviews/refs/heads/main/final_project/router/books.json"
+
 const doesExist = (username) => {
     let usersWithSameName = users.filter(user => user.username === username)
 
@@ -31,7 +33,7 @@ public_users.post("/register", (req,res) => {
 public_users.get('/',function (req, res) {
     let methCall = new Promise((resolve, reject) => {
         try {
-            let allBooks = books
+            let allBooks = axios.get(booksURL)
             resolve(allBooks)
         } catch (err) {
             reject(err)
@@ -39,7 +41,8 @@ public_users.get('/',function (req, res) {
     })
 
     methCall.then(resp => {
-        return res.status(200).send(JSON.stringify(resp, null, 4));
+        books = resp.data
+        return res.status(200).send(JSON.stringify(books, null, 4));
     }).catch(err => {
         return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
     }) 
@@ -91,7 +94,7 @@ public_users.get('/author/:author',function (req, res) {
         });
     
         if (Object.keys(booksByAuthor).length > 0) {
-            return res.send(JSON.stringify(booksByAuthor, null, 4))
+            return res.send(JSON.stringify(booksByAuthor))
         } else {
             return res.status(404).json({message: "Book not found by the Author"});
         }
@@ -124,7 +127,7 @@ public_users.get('/title/:title',function (req, res) {
         });
     
         if (Object.keys(booksByTitle).length > 0) {
-            return res.send(JSON.stringify(booksByTitle, null, 4))
+            return res.send(JSON.stringify(booksByTitle))
         } else {
             return res.status(404).json({message: "Book not found by the Title"});
         }

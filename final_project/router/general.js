@@ -48,8 +48,23 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  let isbn = req.params.isbn
-  return res.status(200).send(books[isbn])
+    let isbn = req.params.isbn
+
+    let methCall = new Promise((resolve, reject) => {
+        try {
+            let allBooks = books
+            resolve(allBooks)
+        } catch (err) {
+            reject(err)
+        }
+    })
+
+    methCall.then(resp => {
+        return res.status(200).send(resp[isbn])
+    }).catch(err => {
+        return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
+    }) 
+    
  });
   
 // Get book details based on author

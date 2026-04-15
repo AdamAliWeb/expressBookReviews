@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require("axios").default;
-// let books = require("./booksdb.js");
+let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
@@ -55,7 +55,7 @@ public_users.get('/isbn/:isbn',function (req, res) {
 
     let methCall = new Promise((resolve, reject) => {
         try {
-            let allBooks = books
+            let allBooks = axios.get(booksURL)
             resolve(allBooks)
         } catch (err) {
             reject(err)
@@ -63,7 +63,8 @@ public_users.get('/isbn/:isbn',function (req, res) {
     })
 
     methCall.then(resp => {
-        return res.status(200).send(resp[isbn])
+        books = resp.data
+        return res.status(200).send(books[isbn])
     }).catch(err => {
         return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
     }) 
@@ -77,7 +78,7 @@ public_users.get('/author/:author',function (req, res) {
 
     let methCall = new Promise((resolve, reject) => {
         try {
-            let allBooks = books
+            let allBooks = axios.get(booksURL)
             resolve(allBooks)
         } catch (err) {
             reject(err)
@@ -85,10 +86,12 @@ public_users.get('/author/:author',function (req, res) {
     })
 
     methCall.then(resp => {
-        Object.keys(resp).forEach(book => {
-            if (resp[book]) {
-                if (resp[book].author === author) {
-                    booksByAuthor[book] = resp[book]
+        books = resp.data
+
+        Object.keys(books).forEach(book => {
+            if (books[book]) {
+                if (books[book].author === author) {
+                    booksByAuthor[book] = books[book]
                 }
             }
         });
@@ -110,7 +113,7 @@ public_users.get('/title/:title',function (req, res) {
 
     let methCall = new Promise((resolve, reject) => {
         try {
-            let allBooks = books
+            let allBooks = axios.get(booksURL)
             resolve(allBooks)
         } catch (err) {
             reject(err)
@@ -118,10 +121,12 @@ public_users.get('/title/:title',function (req, res) {
     })
 
     methCall.then(resp => {
-        Object.keys(resp).forEach(book => {
-            if (resp[book]) {
-                if (resp[book].title === title) {
-                    booksByTitle[book] = resp[book]
+        books = resp.data
+
+        Object.keys(books).forEach(book => {
+            if (books[book]) {
+                if (books[book].title === title) {
+                    booksByTitle[book] = books[book]
                 }
             }
         });

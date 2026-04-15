@@ -72,20 +72,32 @@ public_users.get('/author/:author',function (req, res) {
     const author = req.params.author
     let booksByAuthor = {};
 
-    Object.keys(books).forEach(book => {
-        if (books[book]) {
-            if (books[book].author === author) {
-                booksByAuthor[book] = books[book]
-            }
+    let methCall = new Promise((resolve, reject) => {
+        try {
+            let allBooks = books
+            resolve(allBooks)
+        } catch (err) {
+            reject(err)
         }
-    });
+    })
 
-    if (Object.keys(booksByAuthor > 0)) {
-        return res.send(JSON.stringify(booksByAuthor, null, 4))
-    } else {
-        return res.status(404).json({message: "Book not found by the Author"});
-    }
-  
+    methCall.then(resp => {
+        Object.keys(resp).forEach(book => {
+            if (resp[book]) {
+                if (resp[book].author === author) {
+                    booksByAuthor[book] = resp[book]
+                }
+            }
+        });
+    
+        if (Object.keys(booksByAuthor).length > 0) {
+            return res.send(JSON.stringify(booksByAuthor, null, 4))
+        } else {
+            return res.status(404).json({message: "Book not found by the Author"});
+        }
+    }).catch(err => {
+        return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
+    })
 });
 
 // Get all books based on title

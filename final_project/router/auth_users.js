@@ -47,7 +47,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
   if (books[isbn]) {
     books[isbn].reviews[currentUser] = review
-    return res.status(200).send("Review added/updated successfully")
+    return res.status(200).json({message: "Review added/updated successfully", change: books[isbn]})
   }
 });
 
@@ -60,7 +60,7 @@ regd_users.delete('/auth/review/:isbn',function (req, res) {
 
         if (findUserReview.length > 0) {
             delete books[isbn].reviews[currentUser]
-            return res.status(200).send(`Review deleted successfully`)
+            return res.status(200).json({message: "Review deleted successfully", change: books[isbn]})
         } else {
             return res.status(404).json({message: `Review not found from ${currentUser}`})
         }

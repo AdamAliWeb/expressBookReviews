@@ -68,7 +68,6 @@ public_users.get('/isbn/:isbn',function (req, res) {
     }).catch(err => {
         return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
     }) 
-    
  });
   
 // Get book details based on author

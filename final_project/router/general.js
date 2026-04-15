@@ -1,9 +1,10 @@
 const express = require('express');
+const axios = require("axios").default;
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-
+ 
 const doesExist = (username) => {
     let usersWithSameName = users.filter(user => user.username === username)
 
@@ -28,7 +29,21 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  return res.status(200).send(JSON.stringify(books, null, 4));
+    let methCall = new Promise((resolve, reject) => {
+        try {
+            let allBooks = books
+            resolve(allBooks)
+        } catch (err) {
+            reject(err)
+        }
+    })
+
+    methCall.then(resp => {
+        return res.status(200).send(JSON.stringify(resp, null, 4));
+    }).catch(err => {
+        return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
+    }) 
+  
 });
 
 // Get book details based on ISBN

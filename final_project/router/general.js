@@ -105,19 +105,32 @@ public_users.get('/title/:title',function (req, res) {
     const title = req.params.title
     let booksByTitle = {};
 
-    Object.keys(books).forEach(book => {
-        if (books[book]) {
-            if (books[book].title === title) {
-                booksByTitle[book] = books[book]
-            }
+    let methCall = new Promise((resolve, reject) => {
+        try {
+            let allBooks = books
+            resolve(allBooks)
+        } catch (err) {
+            reject(err)
         }
-    });
+    })
 
-    if (Object.keys(booksByTitle > 0)) {
-        return res.send(JSON.stringify(booksByTitle, null, 4))
-    } else {
-        return res.status(404).json({message: "Book not found by the Title"});
-    }
+    methCall.then(resp => {
+        Object.keys(resp).forEach(book => {
+            if (resp[book]) {
+                if (resp[book].title === title) {
+                    booksByTitle[book] = resp[book]
+                }
+            }
+        });
+    
+        if (Object.keys(booksByTitle).length > 0) {
+            return res.send(JSON.stringify(booksByTitle, null, 4))
+        } else {
+            return res.status(404).json({message: "Book not found by the Title"});
+        }
+    }).catch(err => {
+        return res.status(400).json({message: `The books couldn't be retrieved. ${err} has occured`});
+    })
 });
 
 //  Get book review

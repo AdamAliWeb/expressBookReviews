@@ -138,7 +138,7 @@ public_users.get('/review/:isbn',function (req, res) {
     let isbn = req.params.isbn
 
     if (books[isbn]) {
-        return res.status(200).send(books[isbn].reviews)
+        return res.status(200).send({"reviews": books[isbn].reviews})
     } else {
         return res.status(400).json({message: "Book not found by the ISBN"})
     }
